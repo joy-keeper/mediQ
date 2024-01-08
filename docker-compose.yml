@@ -49,12 +49,14 @@ services:
 
     volumes:
       - ./app:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
 
     networks:
       - my-network
 
 volumes:
   db:
+  node_modules:
 
 
 networks:
