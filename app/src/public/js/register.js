@@ -11,8 +11,8 @@ const addressInput = document.querySelector('input[name="address"]');
 const registerForm = document.querySelector('.sign-up-form');
 let isEmailValid = false;
 
-registerForm.addEventListener("submit", function (event) {
-    register(event);
+registerForm.addEventListener("submit", async function (event) {
+    await register(event);
 });
 
 checkEmailBtn.addEventListener('click', async () => {
@@ -38,12 +38,12 @@ async function checkEmailAvailability() {
     }
 
     try {
-        const response = await fetch('/checkEmail', {
-            method: 'POST',
+        const queryString = `?email=${encodeURIComponent(email)}`;
+        const response = await fetch(`/users/emails${queryString}`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email }),
         });
 
         const data = await response.json();
@@ -55,11 +55,57 @@ async function checkEmailAvailability() {
             alert('사용 가능한 이메일입니다.');
             isEmailValid = true;
         }
-        console.log("중복 여부: ", isDuplicate);
-        return isEmailValid;
+        console.log("중복 여부: ", data.isDuplicate);
     } catch (error) {
         console.error('Error checking email availability:', error);
         isEmailValid = false;
         return false;
+    }
+}
+
+function validate() {
+    if (!isEmailValid) {
+        alert("이메일 중복검사를 해야합니다.");
+        return false;
+    }
+
+    if (passwordInput.value !== confirmPasswordInput.value) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return false;
+    }
+
+    return true;
+}
+
+async function register(event) {
+    event.preventDefault();
+
+    if (!validate()) {
+        return;
+    }
+
+    const req = {
+        email: emailInput.value,
+        password: passwordInput.value,
+        name: nameInput.value,
+        gender: genderInput.value,
+        phoneNumber: phoneNumberInput.value,
+        address: addressInput.value,
+    }
+
+    try {
+        const response = await fetch('/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(req),
+        });
+
+        const data = await response.json();
+        alert(`${data.message}`);
+        location.reload();
+    } catch (error) {
+        alert(`Error: ${error.message}`);
     }
 }

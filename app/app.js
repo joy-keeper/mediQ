@@ -9,8 +9,8 @@ dotenv.config();
 const db = require("./src/config/db/mysql"); // db연결 테스트
 
 // 라우팅
-const home = require("./src/routes/home");
-const userRouter = require("./src/routes/user");
+const viewRouter = require("./src/routes/viewRoutes");
+const userRouter = require("./src/routes/userRoutes");
 
 //앱 세팅
 app.set("view engine", "ejs");
@@ -19,7 +19,7 @@ app.use(express.static(`${__dirname}/src/public`));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/", home);
-app.use("/user", userRouter);
+app.use("/views", viewRouter);
+app.use("/users", userRouter);
 
 module.exports = app;
