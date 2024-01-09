@@ -49,14 +49,14 @@ services:
 
     volumes:
       - ./app:/usr/src/app
-      - node_modules:/usr/src/app/node_modules
+      # - node_modules:/usr/src/app/node_modules //실시간 npm install 설치반영을 위해 주석
 
     networks:
       - my-network
 
 volumes:
   db:
-  node_modules:
+  # node_modules:
 
 
 networks:
