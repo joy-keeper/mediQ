@@ -10,6 +10,7 @@ const db = require("./src/config/db/mysql"); // db연결 테스트
 
 // 라우팅
 const home = require("./src/routes/home");
+const userRouter = require("./src/routes/user");
 
 //앱 세팅
 app.set("view engine", "ejs");
@@ -19,5 +20,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/", home);
+app.use("/user", userRouter);
 
 module.exports = app;
