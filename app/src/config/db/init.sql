@@ -1,6 +1,6 @@
 -- user Table
 CREATE TABLE user (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE user (
 
 -- hospital Table
 CREATE TABLE hospital (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   address VARCHAR(255) NOT NULL,
   phone_number VARCHAR(20) NOT NULL,
@@ -22,13 +22,13 @@ CREATE TABLE hospital (
 
 -- specialty Table
 CREATE TABLE specialty (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   specialty_name VARCHAR(255) NOT NULL
 );
 
 -- hospital_specialty Table
 CREATE TABLE hospital_specialty (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   hospital_id INTEGER NOT NULL,
   specialty_id INTEGER NOT NULL,
   FOREIGN KEY (hospital_id) REFERENCES hospital(id),
@@ -37,7 +37,7 @@ CREATE TABLE hospital_specialty (
 
 -- doctor Table
 CREATE TABLE doctor (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   user_id INTEGER NOT NULL,
   hospital_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES user(id),
@@ -46,7 +46,7 @@ CREATE TABLE doctor (
 
 -- hospital_staff Table
 CREATE TABLE hospital_staff (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   user_id INTEGER NOT NULL,
   hospital_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES user(id),
@@ -55,7 +55,7 @@ CREATE TABLE hospital_staff (
 
 -- medical_schedule Table
 CREATE TABLE medical_schedule (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   doctor_id INTEGER NOT NULL,
   day_of_week VARCHAR(20) NOT NULL,
   start_time TIME NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE medical_schedule (
 
 -- schedule_slot Table
 CREATE TABLE schedule_slot (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   medical_schedule_id INTEGER NOT NULL,
   slot_date DATE NOT NULL,
   current_appointments INTEGER NOT NULL DEFAULT 0,
@@ -78,7 +78,7 @@ CREATE TABLE schedule_slot (
 
 -- hospital_schedule Table
 CREATE TABLE hospital_schedule (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   hospital_id INTEGER NOT NULL,
   day_of_week VARCHAR(20) NOT NULL,
   start_time TIME,
@@ -91,7 +91,7 @@ CREATE TABLE hospital_schedule (
 
 -- hospital_special_schedule Table
 CREATE TABLE hospital_special_schedule (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   hospital_id INTEGER NOT NULL,
   date DATE NOT NULL,
   start_time TIME,
@@ -103,7 +103,7 @@ CREATE TABLE hospital_special_schedule (
 
 -- user_appointment Table
 CREATE TABLE user_appointment (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   user_id INTEGER NOT NULL,
   schedule_slot_id INTEGER NOT NULL,
   appointment_number VARCHAR(20) NOT NULL,
