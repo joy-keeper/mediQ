@@ -1,6 +1,6 @@
 "use strict";
 
-const userService = require('../services/userSerivce');
+const userService = require('../services/user-service');
 
 const checkEmailDuplication = async (req, res) => {
     const { email } = req.query;

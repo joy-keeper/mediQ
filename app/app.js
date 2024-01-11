@@ -9,8 +9,8 @@ const cookieParser = require('cookie-parser');
 dotenv.config();
 
 // 라우팅
-const viewRouter = require("./src/routes/viewRoutes");
-const userRouter = require("./src/routes/userRoutes");
+const viewRouter = require("./src/routes/view-router");
+const userRouter = require("./src/routes/user-router");
 
 //앱 세팅
 app.set("view engine", "ejs");

@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const token = require('../utils/token');
-const userModel = require('../models/user');
+const userModel = require('../models/user-model');
 
 
 async function doesEmailExist(email) {
