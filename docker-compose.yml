@@ -19,7 +19,8 @@ services:
 
     volumes:
       - db:/var/lib/mysql
-      - ./app/src/config/db:/docker-entrypoint-initdb.d
+      - ./app/src/config/db/init:/docker-entrypoint-initdb.d
+      - ./app/src/config/db/migration-scripts:/migration-scripts
 
     networks:
       - my-network
