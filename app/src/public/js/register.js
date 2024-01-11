@@ -1,13 +1,13 @@
 "use strict";
 
-const emailInput = document.querySelector('input[name="email"]');
+const emailInput = document.getElementById("email");
 const checkEmailBtn = document.getElementById('checkUserEmailBtn');
-const passwordInput = document.querySelector('input[name="password"]');
-const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
-const nameInput = document.querySelector('input[name="username"]');
-const genderInput = document.querySelector('input[name="gender"]');
-const phoneNumberInput = document.querySelector('input[name="phoneNumber"]');
-const addressInput = document.querySelector('input[name="address"]');
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+const nameInput = document.getElementById("name");
+const genderInput = document.getElementById("gender");
+const phoneNumberInput = document.getElementById("phoneNumber");
+const addressInput = document.getElementById("address");
 const registerForm = document.querySelector('.sign-up-form');
 let isEmailValid = false;
 
@@ -47,17 +47,14 @@ async function checkEmailAvailability() {
         });
 
         const data = await response.json();
-
-        if (data.isDuplicate) {
-            alert('이미 사용 중인 이메일입니다.');
-            isEmailValid = false;
-        } else {
-            alert('사용 가능한 이메일입니다.');
+        alert(data.message)
+        if (response.status === 200 && !data.isDuplicate) {
             isEmailValid = true;
+        } else {
+            isEmailValid = false;
         }
-        console.log("중복 여부: ", data.isDuplicate);
     } catch (error) {
-        console.error('Error checking email availability:', error);
+        alert(error.message);
         isEmailValid = false;
         return false;
     }
@@ -103,9 +100,11 @@ async function register(event) {
         });
 
         const data = await response.json();
-        alert(`${data.message}`);
-        location.reload();
+        alert(data.message);
+        if (response.status === 201) {
+            location.reload();
+        }
     } catch (error) {
-        alert(`Error: ${error.message}`);
+        alert(error.message);
     }
 }
