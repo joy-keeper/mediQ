@@ -2,12 +2,12 @@
 
 const pool = require('../config/db/mysql');
 
-async function checkDuplicateEmail(email) {
+async function findUserByEmail(email) {
     const [rows] = await pool.execute(
         `SELECT * FROM user WHERE email = ?`,
         [email]
     );
-    return rows.length > 0;
+    return rows.length > 0 ? rows[0] : null;
 }
 
 async function createNewUser(userDTO) {
@@ -19,6 +19,6 @@ async function createNewUser(userDTO) {
 }
 
 module.exports = {
-    checkDuplicateEmail,
+    findUserByEmail,
     createNewUser,
 };
