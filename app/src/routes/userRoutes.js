@@ -1,11 +1,15 @@
 "use strict";
 
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const ctrl = require("../controllers/userController");
+const ctrl = require('../controllers/userController');
+const auth = require('../middlewares/auth-middleware');
+const userValidation = require('../middlewares/user-validation');
 
-router.post("/", ctrl.register);
-router.get("/emails", ctrl.checkEmail);
+
+router.get("/emails", userValidation.validateEmail, ctrl.checkEmailDuplication);
+router.post("/", userValidation.validateSignup, ctrl.register);
+router.post("/login", ctrl.login);
 
 module.exports = router;

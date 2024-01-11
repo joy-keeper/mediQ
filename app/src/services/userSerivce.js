@@ -1,32 +1,47 @@
 "use strict"
 
 const bcrypt = require('bcrypt');
-const user = require('../models/user');
+const token = require('../utils/token');
+const userModel = require('../models/user');
 
-async function checkDuplicateEmail(email) {
-    try {
-        const isDuplicate = await user.checkDuplicateEmail(email);
-        (isDuplicate) ? console.log("중복입니다.") : console.log("중복이 아닙니다.");
-        return isDuplicate;
-    } catch (error) {
-        throw error;
-    }
+
+async function doesEmailExist(email) {
+    const user = await userModel.findUserByEmail(email);
+    return !!user;
 }
 
 async function registerUser(userDTO) {
-    try {
-        const hashedPassword = await bcrypt.hash(userDTO.password, 10);
-        userDTO.password = hashedPassword;
-        await user.createNewUser(userDTO);
-        console.log(userDTO.email, " 님이 가입을 성공하셨습니다.");
-    } catch (error) {
-        console.log(error);
-        console.log(userDTO.email, " 님이 가입을 실패하셨습니다.");
-        throw error;
+    const hashedPassword = await bcrypt.hash(userDTO.password, 10);
+    userDTO.password = hashedPassword;
+    await userModel.createNewUser(userDTO);
+    console.log(userDTO.email, " 님이 가입을 성공하셨습니다.");
+}
+
+async function authenticateUser(loginDTO) {
+    const user = await userModel.findUserByEmail(loginDTO.email);
+    if (!user) {
+        return null;
     }
+
+    const isPasswordMatch = await bcrypt.compare(loginDTO.password, user.password);
+    if (!isPasswordMatch) {
+        return null;
+    }
+
+    const payload = {
+        id: user.id,
+        role: user.role,
+    };
+
+    const tokens = {
+        accessToken: token.createAccessToken(payload),
+        refreshToken: token.createRefreshToken(payload)
+    };
+    return tokens;
 }
 
 module.exports = {
-    checkDuplicateEmail,
+    doesEmailExist,
     registerUser,
+    authenticateUser,
 };
