@@ -14,7 +14,6 @@ async function registerUser(userDTO) {
     const hashedPassword = await bcrypt.hash(userDTO.password, 10);
     userDTO.password = hashedPassword;
     await userModel.createNewUser(userDTO);
-    console.log(userDTO.email, " 님이 가입을 성공하셨습니다.");
 }
 
 async function authenticateUser(loginDTO) {

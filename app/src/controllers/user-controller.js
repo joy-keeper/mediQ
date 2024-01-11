@@ -31,11 +31,13 @@ const register = async (req, res) => {
         }
 
         await userService.registerUser(userDTO);
+        console.log(userDTO.email, " 님이 가입을 성공하셨습니다.");
         res.status(201).json({
             message: `${userDTO.name} 님이 가입을 성공하셨습니다.`,
         });
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             message: '회원가입 하는 도중 문제가 발생했습니다.'
         });
@@ -58,8 +60,8 @@ const login = async (req, res) => {
             res.status(200).json({
                 message: '로그인에 성공하셨습니다.',
             });
-            console.log(tokens);
             console.log("로그인 성공");
+            console.log(tokens);
         } else {
             res.status(401).json({
                 message: '로그인에 실패하셨습니다.'
