@@ -2,13 +2,13 @@
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
+  password VARCHAR(128) NOT NULL,
   name VARCHAR(255) NOT NULL,
-  gender CHAR(1) NOT NULL,
+  gender CHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
   address VARCHAR(255) NOT NULL,
   phone_number VARCHAR(20) NOT NULL,
   registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  role VARCHAR(20) NOT NULL
+  role VARCHAR(10) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'staff', 'doctor'))
 );
 
 -- hospital Table

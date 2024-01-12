@@ -19,7 +19,8 @@ services:
 
     volumes:
       - db:/var/lib/mysql
-      - ./app/src/config/db:/docker-entrypoint-initdb.d
+      - ./app/src/config/db/init:/docker-entrypoint-initdb.d
+      - ./app/src/config/db/migration-scripts:/migration-scripts
 
     networks:
       - my-network
@@ -49,14 +50,14 @@ services:
 
     volumes:
       - ./app:/usr/src/app
-      # - node_modules:/usr/src/app/node_modules //실시간 npm install 설치반영을 위해 주석
+      - node_modules:/usr/src/app/node_modules
 
     networks:
       - my-network
 
 volumes:
   db:
-  # node_modules:
+  node_modules:
 
 
 networks:

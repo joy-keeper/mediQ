@@ -22,11 +22,11 @@
                 <h2 class="title">Login</h2>
                 <div class="input-field">
                   <i class="fas fa-user"></i>
-                  <input type="text" name="usuario" autocomplete="username" placeholder="Username" required="yes">
+                  <input type="email" name="email" placeholder="Email" id="loginEmailInput" required>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-lock"></i>
-                  <input type="password" name="login_password" autocomplete="current-password" placeholder="Password" id="loginPasswordInput" required="yes">
+                  <input type="password" name="password" placeholder="Password" id="loginPasswordInput" required>
                   <i class="far fa-eye" id="toggleLoginPassword" data-target="loginPasswordInput" style="cursor: pointer;"></i>
                 </div>
       
@@ -42,34 +42,34 @@
                 <h2 class="title">Register</h2>
                 <div class="input-field">
                   <i class="fas fa-envelope"></i>
-                  <input type="email" name="email" autocomplete="이메일" placeholder="Email" required>
+                  <input type="email" name="email" autocomplete="이메일" placeholder="Email" id="email" required>
                   <button type="button" id="checkUserEmailBtn">중복검사</button>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-lock"></i>
-                  <input type="password" name="password" autocomplete="current-password" placeholder="비밀번호" id="passwordInput" required>
+                  <input type="password" name="password" placeholder="비밀번호" id="password" required>
                   <i class="far fa-eye" id="togglePassword" data-target="passwordInput" style="cursor: pointer;"></i>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-lock"></i>
-                  <input type="password" name="confirmPassword" autocomplete="current-password" placeholder="비밀번호 확인" id="confirmPasswordInput" required>
+                  <input type="password" name="confirmPassword" placeholder="비밀번호 확인" id="confirmPassword" required>
                   <i class="far fa-eye" id="toggleConfirmPassword" data-target="confirmPasswordInput" style="cursor: pointer;"></i>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-user"></i>
-                  <input type="text" name="username" autocomplete="username" placeholder="이름" required>
+                  <input type="text" name="username" placeholder="이름" id="name" required>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-user"></i>
-                  <input type="text" name="gender" autocomplete="gender" placeholder="성별" required>
+                  <input type="text" name="gender" placeholder="성별" id="gender" required>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-user"></i>
-                  <input type="tel" name="phoneNumber" autocomplete="phone_number" placeholder="전화번호  예) 010-1234-5678" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" required>
+                  <input type="tel" name="phoneNumber" placeholder="전화번호  예) 010-1234-5678" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" id="phoneNumber" required>
                 </div>
                 <div class="input-field">
                   <i class="fas fa-user"></i>
-                  <input type="text" name="address" autocomplete="address" placeholder="주소" required>
+                  <input type="text" name="address" placeholder="주소" id="address" required>
                 </div>
                 <!-- <!-- <label class="check">
                   <input type="checkbox" checked="checked">
