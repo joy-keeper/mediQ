@@ -33,7 +33,7 @@ services:
   server:
     build:
       context: ./app
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
 
     restart: always
 
