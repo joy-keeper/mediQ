@@ -11,6 +11,7 @@ dotenv.config();
 // 라우팅
 const viewRouter = require("./src/routes/view-router");
 const userRouter = require("./src/routes/user-router");
+const appointmentRouter = require("./src/routes/appointment-router");
 
 //앱 세팅
 app.set("view engine", "ejs");
@@ -22,5 +23,6 @@ app.use(cookieParser());
 
 app.use("/views", viewRouter);
 app.use("/users", userRouter);
+app.use("/appointments", appointmentRouter);
 
 module.exports = app;
