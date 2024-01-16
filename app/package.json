@@ -7,7 +7,8 @@
     "app": "bin/www.js"
   },
   "scripts": {
-    "start": "nodemon ./bin/www.js",
+    "start": "node ./bin/www.js",
+    "dev": "nodemon ./bin/www.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -23,5 +24,8 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.5",
     "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
