@@ -101,8 +101,8 @@ CREATE TABLE hospital_special_schedule (
   FOREIGN KEY (hospital_id) REFERENCES hospital(id)
 );
 
--- user_appointment Table
-CREATE TABLE user_appointment (
+-- appointment Table
+CREATE TABLE appointment (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   user_id INTEGER NOT NULL,
   schedule_slot_id INTEGER NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE user_appointment (
   appointment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   notes TEXT,
   type VARCHAR(20) NOT NULL,
-  status VARCHAR(20) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT '예약완료' CHECK (status IN ('예약완료', '예약취소', '진료완료', '노쇼')),
   FOREIGN KEY (user_id) REFERENCES user(id),
   FOREIGN KEY (schedule_slot_id) REFERENCES schedule_slot(id)
 );
