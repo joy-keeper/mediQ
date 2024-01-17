@@ -7,7 +7,7 @@ const getSlotsList = async (req, res) => {
     const date = req.query.date;
 
     if (isNaN(doctorId) || isNaN(Date.parse(date))) {
-        res.status(400).json({ message: '입력 파라미터가 올바르지 않습니다.' });
+        res.status(400).json({ message: '잘못된 요청입니다.' });
         return;
     }
 
