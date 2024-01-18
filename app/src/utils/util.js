@@ -13,6 +13,20 @@ function convertToCamelCase(input) {
     return newObj;
 }
 
+function convertToSnakeCase(input) {
+    if (Array.isArray(input)) {
+        return input.map(convertToSnakeCase);
+    }
+
+    let newObj = {};
+    for (let key in input) {
+        let snakeCaseKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+        newObj[snakeCaseKey] = input[key];
+    }
+    return newObj;
+}
+
 module.exports = {
-    convertToCamelCase
+    convertToCamelCase,
+    convertToSnakeCase,
 };
