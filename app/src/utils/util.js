@@ -1,10 +1,14 @@
 "use strict"
 
-function convertToCamelCase(row) { //카멜케이스로 변환하는 함수
+function convertToCamelCase(input) {
+    if (Array.isArray(input)) {
+        return input.map(convertToCamelCase);
+    }
+
     let newObj = {};
-    for (let key in row) {
+    for (let key in input) {
         let camelCaseKey = key.toLowerCase().replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
-        newObj[camelCaseKey] = row[key];
+        newObj[camelCaseKey] = input[key];
     }
     return newObj;
 }
