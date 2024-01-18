@@ -44,6 +44,32 @@ const register = async (req, res) => {
     }
 };
 
+const modifyUser = async (req, res) => {
+    const userId = Number(req.params.userId); //이미 유효성 검증을 했으므로 NaN일수없음
+    const modifyUserDTO = req.body;
+
+    if (req.user.id !== userId) {
+        return res.status(403).json({ message: '권한이 없습니다.' });
+    }
+    try {
+        const result = await userService.modifyUser(userId, modifyUserDTO);
+        if (!result) {
+            res.status(400).json({
+                message: '잘못된 요청입니다.'
+            });
+        } else {
+            res.status(200).json({
+                message: '수정을 완료하였습니다.'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: '수정 하는 도중 문제가 발생했습니다.'
+        });
+    }
+}
+
 const login = async (req, res) => {
     const loginDTO = req.body;
     try {
@@ -79,5 +105,6 @@ const login = async (req, res) => {
 module.exports = {
     checkEmailDuplication,
     register,
+    modifyUser,
     login,
 };
