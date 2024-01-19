@@ -65,7 +65,7 @@ const modifyUser = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: '수정 하는 도중 문제가 발생했습니다.'
+            message: '수정하는 도중 문제가 발생했습니다.'
         });
     }
 }
