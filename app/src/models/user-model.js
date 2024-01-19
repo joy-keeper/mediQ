@@ -1,5 +1,6 @@
 "use strict"
 
+const { convertToCamelCase, convertToSnakeCase } = require('../utils/util');
 const pool = require('../config/db/mysql');
 
 async function findUserByEmail(email) {
@@ -16,7 +17,18 @@ async function createNewUser(userDTO) {
     await pool.execute(query, params);
 }
 
+async function updateUser(userId, modifyUserDTO) {
+    modifyUserDTO = convertToSnakeCase(modifyUserDTO);
+    const keys = Object.keys(modifyUserDTO);
+    const values = Object.values(modifyUserDTO);
+    const updateFields = keys.map(key => `${key} = ?`).join(', ');
+    const sql = `UPDATE user SET ${updateFields} WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [...values, userId]);
+    return rows.affectedRows > 0; //0이면 없는 userId
+}
+
 module.exports = {
     findUserByEmail,
     createNewUser,
+    updateUser,
 };
