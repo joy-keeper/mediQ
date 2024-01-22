@@ -1,11 +1,13 @@
 "use strict";
 
 // 모듈
+require('express-async-errors');
 const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const app = express();
 const cookieParser = require('cookie-parser');
+const errorHandling = require("./src/middlewares/error");
 dotenv.config();
 
 // 라우팅
@@ -27,4 +29,5 @@ app.use("/users", userRouter);
 app.use("/appointments", appointmentRouter);
 app.use("/doctors", doctorRouter);
 
+app.use(errorHandling);
 module.exports = app;
