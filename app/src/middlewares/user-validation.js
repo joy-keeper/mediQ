@@ -1,6 +1,7 @@
 "user strict"
 
 const { check, body, param, validationResult } = require('express-validator');
+const AppError = require('../utils/custom-error');
 
 const emailCheck = check('email', '이메일이 유효하지 않습니다.').isEmail();
 const userIdCheck = param('userId', '요청이 유효하지 않습니다.').not().isEmpty().matches(/^[1-9][0-9]*$/);
@@ -18,17 +19,17 @@ const handleErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const messages = errors.array().map(error => error.msg);
-        return res.status(400).json({ message: messages.join('\n') });
+        throw new AppError(messages.join('\n'), 400);
     }
     next();
 };
 
-const validateEmail = [
+const emailRequest = [
     emailCheck,
     handleErrors
 ];
 
-const validateSignup = [
+const signupRequest = [
     emailCheck,
     body('password', '비밀번호는 최소 8자 이상이어야 합니다.').isLength({ min: 8 }),
     body('name', '이름은 필수 항목입니다.').not().isEmpty(),
@@ -38,7 +39,7 @@ const validateSignup = [
     handleErrors
 ];
 
-const validateModify = [
+const modifyRequest = [
     userIdCheck,
     modifyUserBodyCheck,
     body('password', '비밀번호는 최소 8자 이상이어야 합니다.').optional().isLength({ min: 8 }),
@@ -50,7 +51,7 @@ const validateModify = [
 ];
 
 module.exports = {
-    validateEmail,
-    validateSignup,
-    validateModify,
+    emailRequest,
+    signupRequest,
+    modifyRequest,
 };
