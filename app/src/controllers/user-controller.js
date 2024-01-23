@@ -8,7 +8,6 @@ const checkEmailDuplication = async (req, res) => {
     const isDuplicate = await userService.doesEmailExist(email);
     const message = isDuplicate ? '중복된 이메일이 존재합니다.' : '사용 가능한 이메일입니다.';
     res.status(200).json({
-        status: 200,
         message,
         isDuplicate
     });
