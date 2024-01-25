@@ -3,6 +3,8 @@
 const appointmentModel = require('../models/appointment-model');
 const slotModel = require('../models/slot-model');
 const pool = require('../config/db/mysql');
+const { AppError } = require('../utils/custom-error');
+const { filterValidKeys } = require('../utils/util');
 
 const MINIMUM_TIME_BEFORE_APPOINTMENT = 30;
 
@@ -27,9 +29,8 @@ async function isValidAppointmentTime(scheduleSlotId) {
 
 async function createAppointment(userId, appointmentDTO) {
     await isValidAppointmentTime(appointmentDTO.scheduleSlotId);
-
     const existingAppointment = await appointmentModel.findAppointmentByUserIdAndSlotId(userId, appointmentDTO.scheduleSlotId);
-    if (!!existingAppointment) {
+    if (existingAppointment) {
         throw new AppError('중복된 예약이 존재합니다.', 400);
     }
     const conn = await pool.getConnection();
@@ -38,7 +39,7 @@ async function createAppointment(userId, appointmentDTO) {
         const slotInfo = await slotModel.findScheduleSlotWithMedicalScheduleById(appointmentDTO.scheduleSlotId, conn);
         if (slotInfo.currentAppointments < slotInfo.maxAppointments) {
             const appointmentNumber = slotInfo.scheduleIdentifier + '-' + slotInfo.nextAppointmentNumber;
-            await appointmentModel.insertAppoint(userId, appointmentNumber, appointmentDTO, conn);
+            await appointmentModel.insertAppointment(userId, appointmentNumber, appointmentDTO, conn);
             await slotModel.incrementAppointmentCount(appointmentDTO.scheduleSlotId, conn);
             await conn.commit();
             return true;
@@ -53,7 +54,24 @@ async function createAppointment(userId, appointmentDTO) {
     }
 }
 
+async function modifyAppointment(user, appointmentId, updateData) {
+    const validKeys = ['notes', 'type'];
+    const filteredUpdateData = filterValidKeys(updateData, validKeys);
+    if (Object.keys(updateData).length === 0 || filteredUpdateData === null) {
+        throw new AppError('요청이 올바르지 않습니다.', 400);
+    }
+    const appointment = await appointmentModel.findAppointmentById(appointmentId);
+    if (!appointment) {
+        throw new AppError('해당 내용을 찾을 수 없습니다.', 404);
+    }
+    if (user.id !== appointment.userId) {
+        throw new AppError('권한이 없습니다.', 403)
+    }
+    await appointmentModel.updateAppointment(appointmentId, filteredUpdateData);
+}
+
 module.exports = {
     isValidAppointmentTime,
     createAppointment,
+    modifyAppointment,
 };
