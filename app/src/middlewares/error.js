@@ -1,13 +1,14 @@
 "use strict"
 
-module.exports = (err, req, res, next) => {  
-  const statusCode = err.statusCode || 500;
-  let message = err.message || '서버 내부 에러가 발생했습니다.'
-  if (statusCode === 500) {
-    console.error(err);
-    message = '서버 내부 에러가 발생했습니다.';
+const { InternalServerError, AppError } = require('../utils/custom-error');
+
+module.exports = (err, req, res, next) => {
+  let error = err;
+  if (!(err instanceof AppError)) { //예기치 못한 에러가 발생한 경우 -> 서버에러
+    console.error(error);
+    error = new InternalServerError();
   }
-  res.status(statusCode).json({
-    message: message
+  res.status(error.statusCode).json({
+    message: error.message
   });
 };

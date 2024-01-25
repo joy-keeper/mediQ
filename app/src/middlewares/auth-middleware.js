@@ -2,14 +2,14 @@
 
 const jwt = require('jsonwebtoken');
 const token = require('../utils/token');
-const AppError = require('../utils/custom-error');
+const { UnauthorizedError } = require('../utils/custom-error');
 
 const check = async (req, res, next) => {
     let accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-        throw new AppError('인증이 필요합니다.', 401);
+        throw new UnauthorizedError();
     }
     try {
         req.user = jwt.verify(accessToken, process.env.ACCESS_SECRET);
@@ -24,7 +24,7 @@ const check = async (req, res, next) => {
             });
             req.user = user;
         } catch (err) {
-            throw new AppError('인증이 필요합니다.', 401);
+            throw new UnauthorizedError();
         }
     }
     next();
