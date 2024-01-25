@@ -110,7 +110,7 @@ CREATE TABLE appointment (
   appointment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   notes TEXT,
   type VARCHAR(20) NOT NULL,
-  status VARCHAR(20) NOT NULL DEFAULT '예약완료' CHECK (status IN ('예약완료', '예약취소', '진료완료', '노쇼')),
+  status VARCHAR(20) NOT NULL DEFAULT 'confirmed',
   FOREIGN KEY (user_id) REFERENCES user(id),
   FOREIGN KEY (schedule_slot_id) REFERENCES schedule_slot(id)
 );
