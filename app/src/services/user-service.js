@@ -3,7 +3,7 @@
 const bcrypt = require('bcrypt');
 const token = require('../utils/token');
 const userModel = require('../models/user-model');
-const AppError = require('../utils/custom-error');
+const { ConflictError, NotFoundError, UnauthorizedError }= require('../utils/custom-error');
 
 async function doesEmailExist(email) {
     const user = await userModel.findUserByEmail(email);
@@ -13,7 +13,7 @@ async function doesEmailExist(email) {
 async function registerUser(userDTO) {
     const user = await userModel.findUserByEmail(userDTO.email);
     if (user) {
-        throw new AppError('중복된 이메일이 존재합니다.', 409);
+        throw new ConflictError('중복된 이메일이 존재합니다');
     }
     const hashedPassword = await bcrypt.hash(userDTO.password, 10);
     userDTO.password = hashedPassword;
@@ -28,19 +28,19 @@ async function modifyUser(userId, modifyUserDTO) {
     }
     const result = await userModel.updateUser(userId, modifyUserDTO);
     if (!result) {
-        throw new AppError('잘못된 요청입니다.', 400);
+        throw new NotFoundError();
     }
 }
 
 async function authenticateUser(loginDTO) {
     const user = await userModel.findUserByEmail(loginDTO.email);
     if (!user) {
-        throw new AppError('로그인에 실패하였습니다.', 401);
+        throw new UnauthorizedError('로그인에 실패하였습니다');
     }
 
     const isPasswordMatch = await bcrypt.compare(loginDTO.password, user.password);
     if (!isPasswordMatch) {
-        throw new AppError('로그인에 실패하였습니다.', 401);
+        throw new UnauthorizedError('로그인에 실패하였습니다');
     }
 
     const payload = {
