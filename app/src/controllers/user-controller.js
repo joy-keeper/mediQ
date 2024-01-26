@@ -2,12 +2,13 @@
 
 const userService = require('../services/user-service');
 const { ForbiddenError }= require('../utils/custom-error');
+const { OK, CREATED } = require('../constants/httpStatusCodes');
 
 const checkEmailDuplication = async (req, res) => {
     const { email } = req.query;
     const isDuplicate = await userService.doesEmailExist(email);
     const message = isDuplicate ? '중복된 이메일이 존재합니다' : '사용 가능한 이메일입니다';
-    res.status(200).json({
+    res.status(OK).json({
         message,
         isDuplicate
     });
@@ -16,7 +17,7 @@ const checkEmailDuplication = async (req, res) => {
 const register = async (req, res) => {
     const userDTO = req.body;
     await userService.registerUser(userDTO);
-    res.status(201).json({
+    res.status(CREATED).json({
         message: '가입에 성공하셨습니다'
     });
 };
@@ -28,7 +29,7 @@ const modifyUser = async (req, res) => {
         throw new ForbiddenError();
     }
     await userService.modifyUser(userId, modifyUserDTO);
-    res.status(200).json({
+    res.status(OK).json({
         message: '수정을 완료하였습니다'
     });
 
@@ -45,7 +46,7 @@ const login = async (req, res) => {
         secure: false,
         httpOnly: true,
     });
-    res.status(200).json({
+    res.status(OK).json({
         message: '로그인에 성공하셨습니다',
     });
 }
