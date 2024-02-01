@@ -18,7 +18,16 @@ const modifyAppointment = async (req, res) => {
     res.status(OK).json({ message: "수정이 완료되었습니다" });
 }
 
+const modifyAppointmentStatus = async (req, res) => {
+    const user = req.user;
+    const appointmentId = req.params.appointmentId;
+    const { status } = req.body;
+    await appointmentService.modifyAppointmentStatus(user, appointmentId, status);
+    res.status(OK).json({ message: "변경이 완료되었습니다" });
+}
+
 module.exports = {
     makeAppointment,
     modifyAppointment,
+    modifyAppointmentStatus,
 };

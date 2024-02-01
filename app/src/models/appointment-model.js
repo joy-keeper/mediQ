@@ -29,9 +29,15 @@ async function updateAppointment(appointmentId, updateData) {
     await pool.execute(sql, [...values, appointmentId]);
 }
 
+async function updateAppointmentStatus(appointmentId, status, conn) {
+    const sql = 'UPDATE appointment SET status = ? WHERE id = ?';
+    await conn.execute(sql, [status, appointmentId]);
+}
+
 module.exports = {
     findAppointmentById,
     findAppointmentByUserIdAndSlotId,
     insertAppointment,
     updateAppointment,
+    updateAppointmentStatus,
 };

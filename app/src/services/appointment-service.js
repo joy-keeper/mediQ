@@ -5,6 +5,7 @@ const slotModel = require('../models/slot-model');
 const pool = require('../config/db/mysql');
 const { BadRequestError, ForbiddenError, NotFoundError, ConflictError } = require('../utils/custom-error');
 const { filterValidKeys } = require('../utils/util');
+const ROLE = require('../constants/roles');
 
 const MINIMUM_TIME_BEFORE_APPOINTMENT = 30; // 예약 가능 최소 시간
 
@@ -70,8 +71,52 @@ async function modifyAppointment(user, appointmentId, updateData) {
     await appointmentModel.updateAppointment(appointmentId, filteredUpdateData);
 }
 
+function checkPermissionToModifyStatus(user, appointment, status) {
+    const isUser = ROLE.USER.includes(user.role);
+    const isHospitalMember = ROLE.HOSPITAL_MEMBER.includes(user.role);
+    if (appointment.status !== "confirmed") { //현재 예약 상태가 예약 완료가 아닌 경우
+        throw new BadRequestError();
+    }
+    if (isUser) {
+        if (appointment.userId !== user.id || status !== "cancelled") { //본인이 아니거나 취소 이외로 변경하려는 경우
+            throw new ForbiddenError();
+        }
+    }
+    else if (isHospitalMember) {
+        if (status === "confirmed" || status === "cancelled") {
+            throw new ForbiddenError();
+        }
+    }
+}
+
+async function modifyAppointmentStatus(user, appointmentId, status) {
+    const appointment = await appointmentModel.findAppointmentById(appointmentId);
+    if (!appointment) {
+        throw new NotFoundError();
+    }
+    checkPermissionToModifyStatus(user, appointment, status);
+
+    const conn = await pool.getConnection();
+    try {
+        await conn.beginTransaction();
+        await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
+        if (status === "cancelled") {
+            await slotModel.decrementAppointmentCount(appointment.scheduleSlotId, conn);
+        } else if (status === "completed" || status === "absent") {
+            await slotModel.updateCompletedAppointments(appointment.scheduleSlotId, conn);
+        }
+        await conn.commit();
+    } catch (error) {
+        await conn.rollback();
+        throw error;
+    } finally {
+        conn.release();
+    }
+}
+
 module.exports = {
     isValidAppointmentTime,
     createAppointment,
     modifyAppointment,
+    modifyAppointmentStatus,
 };

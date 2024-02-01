@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const token = require('../utils/token');
 const { UnauthorizedError } = require('../utils/custom-error');
 
-const check = async (req, res, next) => {
+const isAuth = async (req, res, next) => {
     let accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
 
@@ -31,5 +31,5 @@ const check = async (req, res, next) => {
 };
 
 module.exports = {
-    check
+    isAuth
 };
