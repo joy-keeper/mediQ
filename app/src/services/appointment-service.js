@@ -72,16 +72,20 @@ async function modifyAppointment(user, appointmentId, updateData) {
 }
 
 function checkPermissionToModifyStatus(user, appointment, status) {
+    const isUser = ROLE.USER.includes(user.role);
+    const isHospitalMember = ROLE.HOSPITAL_MEMBER.includes(user.role);
     if (appointment.status !== "confirmed") { //현재 예약 상태가 예약 완료가 아닌 경우
         throw new BadRequestError();
     }
-    if (ROLE.USER.includes(user.role)) {
+    if (isUser) {
         if (appointment.userId !== user.id || status !== "cancelled") { //본인이 아니거나 취소 이외로 변경하려는 경우
             throw new ForbiddenError();
         }
     }
-    else if (ROLE.HOSPITAL_MEMBER.includes(user.role) && status === "confirmed") { //병원멤버가 예약완료 상태로 변경하려는 경우
-        throw new ForbiddenError();
+    else if (isHospitalMember) {
+        if (status === "confirmed" || status === "cancelled") {
+            throw new ForbiddenError();
+        }
     }
 }
 
