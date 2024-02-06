@@ -15,6 +15,7 @@ const viewRouter = require("./src/routes/view-router");
 const userRouter = require("./src/routes/user-router");
 const appointmentRouter = require("./src/routes/appointment-router");
 const doctorRouter = require("./src/routes/doctor-router");
+const searchRouter = require("./src/routes/search-router");
 
 //앱 세팅
 app.set("view engine", "ejs");
@@ -28,6 +29,7 @@ app.use("/views", viewRouter);
 app.use("/users", userRouter);
 app.use("/appointments", appointmentRouter);
 app.use("/doctors", doctorRouter);
+app.use("/search", searchRouter);
 
 app.use(errorHandling);
 module.exports = app;
