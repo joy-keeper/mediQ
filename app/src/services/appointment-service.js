@@ -78,12 +78,12 @@ function checkPermissionToModifyStatus(user, appointment, status) {
         throw new BadRequestError();
     }
     if (isUser) {
-        if (appointment.userId !== user.id || status !== "cancelled") { //본인이 아니거나 취소 이외로 변경하려는 경우
+        if (appointment.userId !== user.id || status !== "cancelled") { //본인이 아니거나 취소 이외로 변경하려는 경우 , cancelled만 가능
             throw new ForbiddenError();
         }
     }
-    else if (isHospitalMember) {
-        if (status === "confirmed" || status === "cancelled") {
+    else if (isHospitalMember) { //completed, absent 만 가능
+        if (status === "cancelled") {
             throw new ForbiddenError();
         }
     }
