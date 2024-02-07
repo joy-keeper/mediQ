@@ -1,0 +1,2 @@
+ALTER TABLE schedule_slot
+DROP COLUMN current_completed_appointments;

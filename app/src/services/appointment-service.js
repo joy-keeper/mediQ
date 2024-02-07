@@ -102,8 +102,6 @@ async function modifyAppointmentStatus(user, appointmentId, status) {
         await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
         if (status === "cancelled") {
             await slotModel.decrementAppointmentCount(appointment.scheduleSlotId, conn);
-        } else if (status === "completed" || status === "absent") {
-            await slotModel.updateCompletedAppointments(appointment.scheduleSlotId, conn);
         }
         await conn.commit();
     } catch (error) {
