@@ -39,8 +39,7 @@ async function createAppointment(userId, appointmentDTO) {
         await conn.beginTransaction();
         const slotInfo = await slotModel.findScheduleSlotWithMedicalScheduleById(appointmentDTO.scheduleSlotId, conn);
         if (slotInfo.currentAppointments < slotInfo.maxAppointments) {
-            const appointmentNumber = slotInfo.scheduleIdentifier + '-' + slotInfo.nextAppointmentNumber;
-            await appointmentModel.insertAppointment(userId, appointmentNumber, appointmentDTO, conn);
+            await appointmentModel.insertAppointment(userId, slotInfo.nextAppointmentNumber, appointmentDTO, conn);
             await slotModel.incrementAppointmentCount(appointmentDTO.scheduleSlotId, conn);
             await conn.commit();
             return true;
