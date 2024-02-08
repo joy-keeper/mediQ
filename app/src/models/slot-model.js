@@ -20,10 +20,6 @@ async function decrementAppointmentCount(scheduleSlotId, conn) {
     await conn.execute('UPDATE schedule_slot SET current_appointments = current_appointments - 1 WHERE id = ?', [scheduleSlotId]);
 }
 
-async function updateCompletedAppointments(scheduleSlotId, conn) {
-    await conn.execute('UPDATE schedule_slot SET current_completed_appointments = current_completed_appointments + 1 WHERE id = ?', [scheduleSlotId]);
-}
-
 async function selectScheduleByDoctorIdAndDate(doctorId, date) {
     const query = `
       SELECT 
@@ -51,5 +47,4 @@ module.exports = {
     incrementAppointmentCount,
     selectScheduleByDoctorIdAndDate,
     decrementAppointmentCount,
-    updateCompletedAppointments,
 };

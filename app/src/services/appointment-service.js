@@ -39,8 +39,7 @@ async function createAppointment(userId, appointmentDTO) {
         await conn.beginTransaction();
         const slotInfo = await slotModel.findScheduleSlotWithMedicalScheduleById(appointmentDTO.scheduleSlotId, conn);
         if (slotInfo.currentAppointments < slotInfo.maxAppointments) {
-            const appointmentNumber = slotInfo.scheduleIdentifier + '-' + slotInfo.nextAppointmentNumber;
-            await appointmentModel.insertAppointment(userId, appointmentNumber, appointmentDTO, conn);
+            await appointmentModel.insertAppointment(userId, slotInfo.nextAppointmentNumber, appointmentDTO, conn);
             await slotModel.incrementAppointmentCount(appointmentDTO.scheduleSlotId, conn);
             await conn.commit();
             return true;
@@ -78,12 +77,12 @@ function checkPermissionToModifyStatus(user, appointment, status) {
         throw new BadRequestError();
     }
     if (isUser) {
-        if (appointment.userId !== user.id || status !== "cancelled") { //본인이 아니거나 취소 이외로 변경하려는 경우
+        if (appointment.userId !== user.id || status !== "cancelled") { //본인이 아니거나 취소 이외로 변경하려는 경우 , cancelled만 가능
             throw new ForbiddenError();
         }
     }
-    else if (isHospitalMember) {
-        if (status === "confirmed" || status === "cancelled") {
+    else if (isHospitalMember) { //completed, absent 만 가능
+        if (status === "cancelled") {
             throw new ForbiddenError();
         }
     }
@@ -102,8 +101,6 @@ async function modifyAppointmentStatus(user, appointmentId, status) {
         await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
         if (status === "cancelled") {
             await slotModel.decrementAppointmentCount(appointment.scheduleSlotId, conn);
-        } else if (status === "completed" || status === "absent") {
-            await slotModel.updateCompletedAppointments(appointment.scheduleSlotId, conn);
         }
         await conn.commit();
     } catch (error) {

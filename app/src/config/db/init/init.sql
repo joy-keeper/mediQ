@@ -71,8 +71,7 @@ CREATE TABLE schedule_slot (
   medical_schedule_id INTEGER NOT NULL,
   slot_date DATE NOT NULL,
   current_appointments INTEGER NOT NULL DEFAULT 0,
-  next_appointment_number INTEGER NOT NULL DEFAULT 0,
-  current_completed_appointments INTEGER NOT NULL DEFAULT 0,
+  next_appointment_number INTEGER NOT NULL DEFAULT 1,
   FOREIGN KEY (medical_schedule_id) REFERENCES medical_schedule(id)
 );
 
@@ -106,7 +105,7 @@ CREATE TABLE appointment (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   user_id INTEGER NOT NULL,
   schedule_slot_id INTEGER NOT NULL,
-  appointment_number VARCHAR(20) NOT NULL,
+  appointment_number INTEGER NOT NULL,
   appointment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   notes TEXT,
   type VARCHAR(20) NOT NULL,
