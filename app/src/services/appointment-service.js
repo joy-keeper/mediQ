@@ -94,21 +94,7 @@ async function modifyAppointmentStatus(user, appointmentId, status) {
         throw new NotFoundError();
     }
     checkPermissionToModifyStatus(user, appointment, status);
-
-    const conn = await pool.getConnection();
-    try {
-        await conn.beginTransaction();
-        await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
-        if (status === "cancelled") {
-            await slotModel.decrementAppointmentCount(appointment.scheduleSlotId, conn);
-        }
-        await conn.commit();
-    } catch (error) {
-        await conn.rollback();
-        throw error;
-    } finally {
-        conn.release();
-    }
+    await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
 }
 
 module.exports = {
