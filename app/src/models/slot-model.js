@@ -4,10 +4,7 @@ const { convertToCamelCase } = require('../utils/util');
 const pool = require('../config/db/mysql');
 
 async function findScheduleSlotWithMedicalScheduleById(scheduleSlotId, conn = null) {
-    let query = `SELECT * FROM schedule_slot INNER JOIN medical_schedule ON schedule_slot.medical_schedule_id = medical_schedule.id WHERE schedule_slot.id = ?`;
-    if (conn) {
-        query += ' FOR UPDATE';
-    }
+    const query = `SELECT * FROM schedule_slot INNER JOIN medical_schedule ON schedule_slot.medical_schedule_id = medical_schedule.id WHERE schedule_slot.id = ?`;
     const [rows] = await (conn || pool).execute(query, [scheduleSlotId]);
     return rows.length > 0 ? convertToCamelCase(rows[0]) : null;
 }
