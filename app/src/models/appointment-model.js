@@ -34,12 +34,12 @@ async function updateAppointmentStatus(appointmentId, status) {
     await pool.execute(sql, [status, appointmentId]);
 }
 
-async function countConfirmedAppointmentsBySlotId(scheduleSlotId, conn, forUpdate = false) {
+async function countConfirmedAppointmentsBySlotId(scheduleSlotId, conn = null, forUpdate = false) {
     let query = `SELECT COUNT(*) AS count FROM appointment WHERE schedule_slot_id = ? AND status = 'confirmed'`;
     if (forUpdate) {
         query += ' FOR UPDATE';
     }
-    const [rows] = await conn.execute(query, [scheduleSlotId]);
+    const [rows] = await (conn || pool).execute(query, [scheduleSlotId]);
     return rows[0].count;
 }
 
