@@ -38,8 +38,10 @@ async function createAppointment(userId, appointmentDTO) {
     try {
         await conn.beginTransaction();
         const slotInfo = await slotModel.findScheduleSlotWithMedicalScheduleById(appointmentDTO.scheduleSlotId, conn);
-        if (slotInfo.currentAppointments < slotInfo.maxAppointments) {
-            await appointmentModel.insertAppointment(userId, slotInfo.nextAppointmentNumber, appointmentDTO, conn);
+        const currentAppointments = await appointmentModel.countConfirmedAppointmentsBySlotId(appointmentDTO.scheduleSlotId, conn, true);
+        if (currentAppointments < slotInfo.maxAppointments) {
+            const appointmentNumber = await appointmentModel.getNextAppointmentNumber(appointmentDTO.scheduleSlotId, conn);
+            await appointmentModel.insertAppointment(userId, appointmentNumber, appointmentDTO, conn);
             await conn.commit();
             return true;
         } else {
@@ -69,6 +71,15 @@ async function modifyAppointment(user, appointmentId, updateData) {
     await appointmentModel.updateAppointment(appointmentId, filteredUpdateData);
 }
 
+async function modifyAppointmentStatus(user, appointmentId, status) {
+    const appointment = await appointmentModel.findAppointmentById(appointmentId);
+    if (!appointment) {
+        throw new NotFoundError();
+    }
+    checkPermissionToModifyStatus(user, appointment, status);
+    await appointmentModel.updateAppointmentStatus(appointmentId, status);
+}
+
 function checkPermissionToModifyStatus(user, appointment, status) {
     const isUser = ROLE.USER.includes(user.role);
     const isHospitalMember = ROLE.HOSPITAL_MEMBER.includes(user.role);
@@ -85,15 +96,6 @@ function checkPermissionToModifyStatus(user, appointment, status) {
             throw new ForbiddenError();
         }
     }
-}
-
-async function modifyAppointmentStatus(user, appointmentId, status) {
-    const appointment = await appointmentModel.findAppointmentById(appointmentId);
-    if (!appointment) {
-        throw new NotFoundError();
-    }
-    checkPermissionToModifyStatus(user, appointment, status);
-    await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
 }
 
 module.exports = {
