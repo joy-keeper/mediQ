@@ -40,7 +40,6 @@ async function createAppointment(userId, appointmentDTO) {
         const slotInfo = await slotModel.findScheduleSlotWithMedicalScheduleById(appointmentDTO.scheduleSlotId, conn);
         if (slotInfo.currentAppointments < slotInfo.maxAppointments) {
             await appointmentModel.insertAppointment(userId, slotInfo.nextAppointmentNumber, appointmentDTO, conn);
-            await slotModel.incrementAppointmentCount(appointmentDTO.scheduleSlotId, conn);
             await conn.commit();
             return true;
         } else {
