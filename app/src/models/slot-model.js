@@ -9,6 +9,12 @@ async function findScheduleSlotWithMedicalScheduleById(scheduleSlotId, conn = nu
     return rows.length > 0 ? convertToCamelCase(rows[0]) : null;
 }
 
+async function findSlotMaxAppointments(scheduleSlotId, conn = null) {
+    const query = `SELECT slot_max_appointments FROM schedule_slot WHERE schedule_slot.id = ?`;
+    const [rows] = await (conn || pool).execute(query, [scheduleSlotId]);
+    return convertToCamelCase(rows[0]);
+}
+
 async function selectScheduleByDoctorIdAndDate(doctorId, date) {
     const query = `
       SELECT 
@@ -33,5 +39,6 @@ async function selectScheduleByDoctorIdAndDate(doctorId, date) {
 
 module.exports = {
     findScheduleSlotWithMedicalScheduleById,
+    findSlotMaxAppointments,
     selectScheduleByDoctorIdAndDate,
 };
