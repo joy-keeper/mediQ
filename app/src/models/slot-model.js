@@ -24,8 +24,7 @@ async function selectScheduleByDoctorIdAndDate(doctorId, date) {
       schedule_slot.slot_date,
       medical_schedule.start_time,
       medical_schedule.end_time,
-      medical_schedule.max_appointments,
-      schedule_slot.current_appointments
+      schedule_slot.slot_max_appointments
       FROM medical_schedule
       JOIN schedule_slot ON medical_schedule.id = schedule_slot.medical_schedule_id
       WHERE medical_schedule.doctor_id = ?
