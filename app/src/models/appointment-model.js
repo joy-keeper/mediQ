@@ -29,9 +29,24 @@ async function updateAppointment(appointmentId, updateData) {
     await pool.execute(sql, [...values, appointmentId]);
 }
 
-async function updateAppointmentStatus(appointmentId, status, conn) {
+async function updateAppointmentStatus(appointmentId, status) {
     const sql = 'UPDATE appointment SET status = ? WHERE id = ?';
-    await conn.execute(sql, [status, appointmentId]);
+    await pool.execute(sql, [status, appointmentId]);
+}
+
+async function countConfirmedAppointmentsBySlotId(scheduleSlotId, conn = null, forUpdate = false) {
+    let query = `SELECT COUNT(*) AS count FROM appointment WHERE schedule_slot_id = ? AND status = 'confirmed'`;
+    if (forUpdate) {
+        query += ' FOR UPDATE';
+    }
+    const [rows] = await (conn || pool).execute(query, [scheduleSlotId]);
+    return rows[0].count;
+}
+
+async function getNextAppointmentNumber(scheduleSlotId, conn) {
+    const query = `SELECT MAX(appointment_number) AS maxAppointmentNumber FROM appointment WHERE schedule_slot_id = ?`;
+    const [rows] = await conn.execute(query, [scheduleSlotId]);
+    return rows[0].maxAppointmentNumber !== null ? rows[0].maxAppointmentNumber + 1 : 1;
 }
 
 module.exports = {
@@ -40,4 +55,6 @@ module.exports = {
     insertAppointment,
     updateAppointment,
     updateAppointmentStatus,
+    countConfirmedAppointmentsBySlotId,
+    getNextAppointmentNumber,
 };

@@ -4,20 +4,15 @@ const { convertToCamelCase } = require('../utils/util');
 const pool = require('../config/db/mysql');
 
 async function findScheduleSlotWithMedicalScheduleById(scheduleSlotId, conn = null) {
-    let query = `SELECT * FROM schedule_slot INNER JOIN medical_schedule ON schedule_slot.medical_schedule_id = medical_schedule.id WHERE schedule_slot.id = ?`;
-    if (conn) {
-        query += ' FOR UPDATE';
-    }
+    const query = `SELECT * FROM schedule_slot INNER JOIN medical_schedule ON schedule_slot.medical_schedule_id = medical_schedule.id WHERE schedule_slot.id = ?`;
     const [rows] = await (conn || pool).execute(query, [scheduleSlotId]);
     return rows.length > 0 ? convertToCamelCase(rows[0]) : null;
 }
 
-async function incrementAppointmentCount(scheduleSlotId, conn) {
-    await conn.execute('UPDATE schedule_slot SET current_appointments = current_appointments + 1, next_appointment_number = next_appointment_number + 1 WHERE id = ?', [scheduleSlotId]);
-}
-
-async function decrementAppointmentCount(scheduleSlotId, conn) {
-    await conn.execute('UPDATE schedule_slot SET current_appointments = current_appointments - 1 WHERE id = ?', [scheduleSlotId]);
+async function findSlotMaxAppointments(scheduleSlotId, conn = null) {
+    const query = `SELECT slot_max_appointments FROM schedule_slot WHERE schedule_slot.id = ?`;
+    const [rows] = await (conn || pool).execute(query, [scheduleSlotId]);
+    return convertToCamelCase(rows[0]);
 }
 
 async function selectScheduleByDoctorIdAndDate(doctorId, date) {
@@ -29,8 +24,7 @@ async function selectScheduleByDoctorIdAndDate(doctorId, date) {
       schedule_slot.slot_date,
       medical_schedule.start_time,
       medical_schedule.end_time,
-      medical_schedule.max_appointments,
-      schedule_slot.current_appointments
+      schedule_slot.slot_max_appointments
       FROM medical_schedule
       JOIN schedule_slot ON medical_schedule.id = schedule_slot.medical_schedule_id
       WHERE medical_schedule.doctor_id = ?
@@ -44,7 +38,6 @@ async function selectScheduleByDoctorIdAndDate(doctorId, date) {
 
 module.exports = {
     findScheduleSlotWithMedicalScheduleById,
-    incrementAppointmentCount,
+    findSlotMaxAppointments,
     selectScheduleByDoctorIdAndDate,
-    decrementAppointmentCount,
 };

@@ -37,10 +37,11 @@ async function createAppointment(userId, appointmentDTO) {
     const conn = await pool.getConnection();
     try {
         await conn.beginTransaction();
-        const slotInfo = await slotModel.findScheduleSlotWithMedicalScheduleById(appointmentDTO.scheduleSlotId, conn);
-        if (slotInfo.currentAppointments < slotInfo.maxAppointments) {
-            await appointmentModel.insertAppointment(userId, slotInfo.nextAppointmentNumber, appointmentDTO, conn);
-            await slotModel.incrementAppointmentCount(appointmentDTO.scheduleSlotId, conn);
+        const { slotMaxAppointments } = await slotModel.findSlotMaxAppointments(appointmentDTO.scheduleSlotId, conn);
+        const currentAppointments = await appointmentModel.countConfirmedAppointmentsBySlotId(appointmentDTO.scheduleSlotId, conn, true);
+        if (currentAppointments < slotMaxAppointments) {
+            const appointmentNumber = await appointmentModel.getNextAppointmentNumber(appointmentDTO.scheduleSlotId, conn);
+            await appointmentModel.insertAppointment(userId, appointmentNumber, appointmentDTO, conn);
             await conn.commit();
             return true;
         } else {
@@ -70,6 +71,15 @@ async function modifyAppointment(user, appointmentId, updateData) {
     await appointmentModel.updateAppointment(appointmentId, filteredUpdateData);
 }
 
+async function modifyAppointmentStatus(user, appointmentId, status) {
+    const appointment = await appointmentModel.findAppointmentById(appointmentId);
+    if (!appointment) {
+        throw new NotFoundError();
+    }
+    checkPermissionToModifyStatus(user, appointment, status);
+    await appointmentModel.updateAppointmentStatus(appointmentId, status);
+}
+
 function checkPermissionToModifyStatus(user, appointment, status) {
     const isUser = ROLE.USER.includes(user.role);
     const isHospitalMember = ROLE.HOSPITAL_MEMBER.includes(user.role);
@@ -85,29 +95,6 @@ function checkPermissionToModifyStatus(user, appointment, status) {
         if (status === "cancelled") {
             throw new ForbiddenError();
         }
-    }
-}
-
-async function modifyAppointmentStatus(user, appointmentId, status) {
-    const appointment = await appointmentModel.findAppointmentById(appointmentId);
-    if (!appointment) {
-        throw new NotFoundError();
-    }
-    checkPermissionToModifyStatus(user, appointment, status);
-
-    const conn = await pool.getConnection();
-    try {
-        await conn.beginTransaction();
-        await appointmentModel.updateAppointmentStatus(appointmentId, status, conn);
-        if (status === "cancelled") {
-            await slotModel.decrementAppointmentCount(appointment.scheduleSlotId, conn);
-        }
-        await conn.commit();
-    } catch (error) {
-        await conn.rollback();
-        throw error;
-    } finally {
-        conn.release();
     }
 }
 

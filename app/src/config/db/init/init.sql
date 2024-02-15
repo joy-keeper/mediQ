@@ -60,7 +60,7 @@ CREATE TABLE medical_schedule (
   day_of_week VARCHAR(20) NOT NULL,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
-  max_appointments INTEGER NOT NULL,
+  initial_max_appointments INTEGER NOT NULL,
   schedule_identifier CHAR(1) NOT NULL,
   FOREIGN KEY (doctor_id) REFERENCES doctor(id)
 );
@@ -70,8 +70,7 @@ CREATE TABLE schedule_slot (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   medical_schedule_id INTEGER NOT NULL,
   slot_date DATE NOT NULL,
-  current_appointments INTEGER NOT NULL DEFAULT 0,
-  next_appointment_number INTEGER NOT NULL DEFAULT 1,
+  slot_max_appointments INTEGER NOT NULL,
   FOREIGN KEY (medical_schedule_id) REFERENCES medical_schedule(id)
 );
 
