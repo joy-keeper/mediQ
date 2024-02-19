@@ -1,6 +1,7 @@
 "use strict";
 
 const userService = require('../services/user-service');
+const appointmentService = require('../services/appointment-service');
 const { ForbiddenError }= require('../utils/custom-error');
 const { OK, CREATED } = require('../constants/httpStatusCodes');
 
@@ -51,9 +52,23 @@ const login = async (req, res) => {
     });
 }
 
+const getUserAppointments = async (req, res) => {
+    const { status } = req.query;
+    const userId = req.params.userId;
+    if (String(req.user.id) !== userId) {
+        throw new ForbiddenError();
+    }
+    const result = await appointmentService.getAppointmentsByUser(userId, status);
+    res.status(OK).json({
+        message: "예약조회를 성공하였습니다.",
+        data: result
+    })
+}
+
 module.exports = {
     checkEmailDuplication,
     register,
     modifyUser,
     login,
+    getUserAppointments,
 };
