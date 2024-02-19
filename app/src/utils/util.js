@@ -26,6 +26,10 @@ function convertToSnakeCase(input) {
     return newObj;
 }
 
+function convertDateToISOString(date) {
+    return date.toISOString().split('T')[0];
+}
+
 /**
  * 주어진 데이터 객체(data)에서 유효한 키(validKeys)에 해당하는 속성만을 추출하여 새로운 객체를 생성하는 함수.
  * 만약 data 객체가 유효하지 않은 키를 포함하고 있다면, 함수는 null을 반환
@@ -55,5 +59,6 @@ function filterValidKeys(data, validKeys) {
 module.exports = {
     convertToCamelCase,
     convertToSnakeCase,
+    convertDateToISOString,
     filterValidKeys,
 };
