@@ -49,6 +49,89 @@ async function getNextAppointmentNumber(scheduleSlotId, conn) {
     return rows[0].maxAppointmentNumber !== null ? rows[0].maxAppointmentNumber + 1 : 1;
 }
 
+async function findConfirmedAppointments(userId) {
+    const query = `
+        SELECT 
+            a.id, 
+            a.status,
+            a.schedule_slot_id,
+            a.appointment_number,
+            ss.slot_date,
+            ms.start_time,
+            ms.doctor_id,
+            ms.schedule_identifier,
+            h.name AS hospital_name
+        FROM 
+            appointment a
+        JOIN 
+            schedule_slot ss ON a.schedule_slot_id = ss.id
+        JOIN 
+            medical_schedule ms ON ss.medical_schedule_id = ms.id
+        JOIN 
+            doctor d ON ms.doctor_id = d.id
+        JOIN 
+            hospital h ON d.hospital_id = h.id
+        WHERE 
+            a.user_id = ? AND a.status = 'confirmed'
+    `;
+    const [rows] = await pool.execute(query, [userId]);
+    return convertToCamelCase(rows);
+}
+
+async function findNotConfirmedAppointments(userId) {
+    const query = `
+        SELECT 
+            a.id,
+            a.status,
+            ss.slot_date,
+            h.name AS hospital_name
+        FROM 
+            appointment a
+        JOIN 
+            schedule_slot ss ON a.schedule_slot_id = ss.id
+        JOIN 
+            medical_schedule ms ON ss.medical_schedule_id = ms.id
+        JOIN 
+            doctor d ON ms.doctor_id = d.id
+        JOIN 
+            hospital h ON d.hospital_id = h.id
+        WHERE 
+            a.user_id = ? AND a.status != 'confirmed'
+    `;
+    const [rows] = await pool.execute(query, [userId]);
+    return convertToCamelCase(rows);
+}
+
+async function getWaitingNumSameSlot(appointmentId, appointmentNumber) {
+    const query = `
+        SELECT 
+            COUNT(*) AS count
+        FROM 
+            appointment 
+        WHERE 
+            schedule_slot_id = ? AND appointment_number < ? AND status = 'confirmed'
+    `;
+    const [rows] = await pool.execute(query, [appointmentId, appointmentNumber]);
+    return rows[0].count;
+}
+
+async function getWaitingNumPrevSlots(doctorId, date, startTime) {
+    const query = `
+        SELECT 
+            COUNT(*) AS count
+        FROM 
+            appointment a
+        JOIN 
+            schedule_slot ss ON a.schedule_slot_id = ss.id
+        JOIN 
+            medical_schedule ms ON ss.medical_schedule_id = ms.id
+        WHERE 
+            ms.doctor_id = ? AND ss.slot_date = ? AND ms.start_time < ? AND a.status = 'confirmed'
+    `;
+    const [rows] = await pool.execute(query, [doctorId, date, startTime]);
+    return rows[0].count;
+}
+
 module.exports = {
     findAppointmentById,
     findAppointmentByUserIdAndSlotId,
@@ -57,4 +140,8 @@ module.exports = {
     updateAppointmentStatus,
     countConfirmedAppointmentsBySlotId,
     getNextAppointmentNumber,
+    findConfirmedAppointments,
+    findNotConfirmedAppointments,
+    getWaitingNumSameSlot,
+    getWaitingNumPrevSlots,
 };
