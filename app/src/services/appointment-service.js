@@ -4,7 +4,7 @@ const appointmentModel = require('../models/appointment-model');
 const slotModel = require('../models/slot-model');
 const pool = require('../config/db/mysql');
 const { BadRequestError, ForbiddenError, NotFoundError, ConflictError } = require('../utils/custom-error');
-const { filterValidKeys } = require('../utils/util');
+const { filterValidKeys, convertDateToISOString } = require('../utils/util');
 const ROLE = require('../constants/roles');
 
 const MINIMUM_TIME_BEFORE_APPOINTMENT = 30; // 예약 가능 최소 시간
@@ -98,9 +98,45 @@ function checkPermissionToModifyStatus(user, appointment, status) {
     }
 }
 
+async function getAppointmentsByUser(userId, status) {
+    let appointments = [];
+    if (status === "current") {
+        appointments = await getCurrentAppointments(userId);
+    } else if (status === "past") {
+        appointments = await getPastAppointments(userId);
+    } else {
+        throw new BadRequestError();
+    }
+    return appointments;
+}
+
+async function getCurrentAppointments(userId) {
+    let appointments = await appointmentModel.findConfirmedAppointments(userId);
+    for (const appointment of appointments) {
+        appointment.waitingCount = await getWaitingCount(appointment);
+        appointment.slotDate = convertDateToISOString(appointment.slotDate);
+    }
+    return appointments;
+}
+
+async function getPastAppointments(userId) {
+    let appointments = await appointmentModel.findNotConfirmedAppointments(userId);
+    for (const appointment of appointments) {
+        appointment.slotDate = convertDateToISOString(appointment.slotDate);
+    }
+    return appointments;
+}
+
+async function getWaitingCount(appointment) {
+    const waitingNumSameSlot = await appointmentModel.getWaitingNumSameSlot(appointment.scheduleSlotId, appointment.appointmentNumber); // 해당 예약과 같은 슬롯내의 대기인원
+    const waitingNumPrevSlot = await appointmentModel.getWaitingNumPrevSlots(appointment.doctorId, appointment.slotDate, appointment.startTime); // 해당 예약과 같은 날짜의 예약 중 자신보다 앞쪽 슬롯의 대기인원
+    return waitingNumPrevSlot + waitingNumSameSlot;
+}
+
 module.exports = {
     isValidAppointmentTime,
     createAppointment,
     modifyAppointment,
     modifyAppointmentStatus,
+    getAppointmentsByUser,
 };
