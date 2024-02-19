@@ -128,7 +128,7 @@ async function getPastAppointments(userId) {
 }
 
 async function getWaitingCount(appointment) {
-    const waitingNumSameSlot = await appointmentModel.getWaitingNumSameSlot(appointment.scheduleSlotId, appointment.appointmentNumber); // 해당 예약과 같은 슬롯내의 대기인원
+    const waitingNumSameSlot = await appointmentModel.getWaitingNumSameSlot(appointment.scheduleSlotId, appointment.appointmentNumber); // 같은 예약 슬롯내의 자신보다 앞선 예약번호를 가진 대기인원
     const waitingNumPrevSlot = await appointmentModel.getWaitingNumPrevSlots(appointment.doctorId, appointment.slotDate, appointment.startTime); // 해당 예약과 같은 날짜의 예약 중 자신보다 앞쪽 슬롯의 대기인원
     return waitingNumPrevSlot + waitingNumSameSlot;
 }
